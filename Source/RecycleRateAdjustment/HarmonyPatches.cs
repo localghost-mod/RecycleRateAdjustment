@@ -2,17 +2,22 @@
 using System.Reflection.Emit;
 using HarmonyLib;
 using Verse;
+using static HarmonyLib.AccessTools;
 
 namespace RecycleRate
 {
     [StaticConstructorOnStartup]
     public static class Startup
     {
-        static Startup() => new Harmony("localghost.RecycleRateAdjustment").PatchAll();
+        static Startup()
+        {
+            var harmony = new Harmony("localghost.RecycleRateAdjustment");
+            harmony.Patch(EnumeratorMoveNext(Method("Verse.Thing:SmeltProducts")), transpiler: new HarmonyMethod(Method("RecycleRate.HarmonyPatches:Transpiler")));
+            harmony.Patch(Method("MendAndRecycle.JobDriverUtils:Reclaim"), transpiler: new HarmonyMethod(Method("RecycleRate.HarmonyPatches:ReclaimTranspiler")));
+        }
     }
 
-    [HarmonyPatch(typeof(Thing), nameof(Thing.SmeltProducts), MethodType.Enumerator)]
-    public static class SmeltProductsPatch
+    public class HarmonyPatches
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
@@ -20,14 +25,22 @@ namespace RecycleRate
             {
                 if (instruction.opcode == OpCodes.Ldc_R4)
                 {
-                    yield return new CodeInstruction(
-                        OpCodes.Ldsfld,
-                        typeof(RecycleRateMod).GetField(nameof(RecycleRateMod.settings))
-                    );
-                    yield return new CodeInstruction(
-                        OpCodes.Ldfld,
-                        typeof(Settings).GetField(nameof(Settings.recycleRate))
-                    );
+                    yield return new CodeInstruction(OpCodes.Ldsfld, typeof(RecycleRateMod).GetField(nameof(RecycleRateMod.settings)));
+                    yield return new CodeInstruction(OpCodes.Ldfld, typeof(Settings).GetField(nameof(Settings.recycleRate)));
+                }
+                else
+                    yield return instruction;
+            }
+        }
+
+        static IEnumerable<CodeInstruction> ReclaimTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            foreach (var instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Ldarg_1)
+                {
+                    yield return new CodeInstruction(OpCodes.Ldsfld, typeof(RecycleRateMod).GetField(nameof(RecycleRateMod.settings)));
+                    yield return new CodeInstruction(OpCodes.Ldfld, typeof(Settings).GetField(nameof(Settings.recycleRate)));
                 }
                 else
                     yield return instruction;

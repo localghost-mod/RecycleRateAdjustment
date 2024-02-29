@@ -24,13 +24,7 @@ namespace RecycleRate
         {
             Listing_Standard ls = new Listing_Standard();
             ls.Begin(inRect);
-            ls.SliderLabeled(
-                "RR.RecycleRate".Translate(),
-                ref settings.recycleRate,
-                settings.recycleRate.ToStringPercent(),
-                0.01f,
-                1.00f
-            );
+            ls.SliderLabeled("RR.RecycleRate".Translate(), ref settings.recycleRate, settings.recycleRate.ToStringPercent(), 0.01f, 1.00f);
             if (ls.ButtonText("RR.Reset".Translate()))
                 settings.recycleRate = 0.25f;
             ls.End();
@@ -41,21 +35,11 @@ namespace RecycleRate
 
     public static class Listing_StandardExtension
     {
-        public static void SliderLabeled(
-            this Listing_Standard ls,
-            string label,
-            ref float val,
-            string format,
-            float min = 0f,
-            float max = 1f,
-            string tooltip = null
-        )
+        public static void SliderLabeled(this Listing_Standard ls, string label, ref float val, string format, float min = 0f, float max = 1f, string tooltip = null)
         {
             Rect rect = ls.GetRect(Text.LineHeight);
             Rect rect2 = GenUI.Rounded(GenUI.LeftPart(rect, 0.5f));
-            Rect rect3 = GenUI.Rounded(
-                GenUI.LeftPart(GenUI.Rounded(GenUI.RightPart(rect, 0.3f)), 0.67f)
-            );
+            Rect rect3 = GenUI.Rounded(GenUI.LeftPart(GenUI.Rounded(GenUI.RightPart(rect, 0.3f)), 0.67f));
             Rect rect4 = GenUI.Rounded(GenUI.RightPart(rect, 0.1f));
             TextAnchor anchor = Text.Anchor;
             Text.Anchor = TextAnchor.MiddleLeft;
