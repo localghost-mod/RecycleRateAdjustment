@@ -44,7 +44,7 @@ namespace RecycleRate
             TextAnchor anchor = Text.Anchor;
             Text.Anchor = TextAnchor.MiddleLeft;
             Widgets.Label(rect2, label);
-            float num = Widgets.HorizontalSlider_NewTemp(rect3, val, min, max);
+            float num = Widgets.HorizontalSlider(rect3, val, min, max);
             val = num;
             Text.Anchor = TextAnchor.MiddleRight;
             Widgets.Label(rect4, string.Format(format, val));

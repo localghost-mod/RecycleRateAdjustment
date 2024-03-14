@@ -13,8 +13,10 @@ namespace RecycleRate
         {
             var harmony = new Harmony("localghost.RecycleRateAdjustment");
             harmony.Patch(EnumeratorMoveNext(Method("Verse.Thing:SmeltProducts")), transpiler: new HarmonyMethod(Method("RecycleRate.HarmonyPatches:Transpiler")));
-            harmony.Patch(Method("MendAndRecycle.JobDriverUtils:Reclaim"), transpiler: new HarmonyMethod(Method("RecycleRate.HarmonyPatches:ReclaimTranspiler")));
+            if (Contains("notfood.mendandrecycle"))
+                harmony.Patch(Method("MendAndRecycle.JobDriverUtils:Reclaim"), transpiler: new HarmonyMethod(Method("RecycleRate.HarmonyPatches:ReclaimTranspiler")));
         }
+        static bool Contains(string packageId) => ModLister.GetActiveModWithIdentifier(packageId, true) != null;
     }
 
     public class HarmonyPatches
